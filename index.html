@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Xml-Parser</title>
+    <style>
+        .cellStyle
+        {
+            background-color: gray;
+        }
+    </style>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+</head>
+<body>
+<table cellspacing="5px" id="test_tbl" width="1000px">
+    <tr>
+        <th class="cellStyle">ID</th>
+        <th class="cellStyle">Name</th>
+        <th class="cellStyle">Description</th>
+        <th class="cellStyle">Type</th>
+        <th class="cellStyle">Value</th>
+    </tr>
+    <tr>
+        <td class="cellStyle">1</td>
+        <td class="cellStyle">test</td>
+        <td class="cellStyle">test</td>
+        <td class="cellStyle">test</td>
+        <td class="cellStyle">test</td>
+        <td><button class="edit">edit</button> <button class="del">del</button></td>
+    </tr>
+</table>
+<div id="edit_div" class="pad3 bg bord abs dis" style="display:none">
+    <input type="text" size="20%">
+    <input type="text" size="20%">
+    <input type="text" size="20%">
+    <input type="text" size="20%">
+    <input type="text" size="20%">
+    <input type="button" value="Сохранить" id="save_but">
+    <input type="button" value="Отменить" id="cancel_but">
+</div>
+<p>Тестовый текст для проверки анимации</p>
+<button id="add" style="">Add</button>
+<div id="add_div" class="pad3 bg bord abs dis" style="display:none">
+    <input type="text" size="20%">
+    <input type="text" size="20%">
+    <input type="text" size="20%">
+    <input type="text" size="20%">
+    <input type="text" size="20%">
+    <input type="button" value="Сохранить" id="add_but">
+    <input type="button" value="Отменить" id="cancel_add_but">
+</div>
+<script type="text/javascript">
+    var tr;
+    function edit_appearence(){
+        $('#edit_div').slideToggle(200);
+
+    }
+    function add_appearence(){
+        $('#add_div').slideToggle(200);
+
+    }
+    $('button.edit','#test_tbl').click(function (){
+
+        tr = $(this).parent().parent();
+
+        for(var i=0; i<5; i++)
+
+        $('input:eq('+i+')','#edit_div').val($('td:eq('+i+')',tr).text());
+
+        edit_appearence();
+
+    });
+
+    $('button.del','#test_tbl').click(function (){
+
+        if(!confirm("Delete?")) return;
+
+        $(this).parent().parent().remove();
+
+    });
+
+    $('#save_but','#edit_div').click(function (){
+
+        for(var i=0; i<5; i++)
+
+        $('td:eq('+i+')',tr).text($('input:eq('+i+')','#edit_div').val());
+
+        edit_appearence();
+
+    });
+
+    $('#cancel_but','#edit_div').click(edit_appearence);
+    $('#add').click(function() {
+        add_appearence();
+        /*$('#test_tbl').append(
+        '<tr>'+$('tr:last').html()+'</tr>').slideToggle(200);*/
+        }
+    );
+    $('#cancel_add_but','#add_div').click(function(){
+        add_appearence();
+    })
+
+</script>
+</body>
+</html>
