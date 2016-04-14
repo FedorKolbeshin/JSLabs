@@ -26,7 +26,8 @@
         <td class="cellStyle">test</td>
         <td class="cellStyle">test</td>
         <td class="cellStyle">test</td>
-        <td class="cellStyle"><button class="edit" value="1">edit</button> <button class="del" value="1">del</button></td>
+        <td class="cellStyle"><button id="edit1" value="editValue">edit</button></td>
+        <td class="cellStyle"><button id="del1" value="deleteValue">del</button></td>
     </tr>
     <tr>
         <td class="cellStyle">1</td>
@@ -34,12 +35,10 @@
         <td class="cellStyle">test</td>
         <td class="cellStyle">test</td>
         <td class="cellStyle">test</td>
-        <td class="cellStyle"><button class="edit" value="2">edit</button> <button class="del" value="2">del</button></td>
+        <td class="cellStyle"><button id="edit2">edit</button></td>
+        <td class="cellStyle"><button id="del2">del</button></td>
     </tr>
 </table>
-<script>
-    alert($('button.edit:last').attr("value"));
-</script>
 <div id="edit_div" class="pad3 bg bord abs dis" style="display:none">
     <input type="text" size="20%">
     <input type="text" size="20%">
@@ -50,14 +49,14 @@
     <input type="button" value="Отменить" id="cancel_but">
 </div>
 <p>Тестовый текст для проверки анимации</p>
-<button id="add" style="">Add</button>
+<button id="add">Add</button>
 <div id="add_div" class="pad3 bg bord abs dis" style="display:none">
     <input type="text" size="20%">
     <input type="text" size="20%">
     <input type="text" size="20%">
     <input type="text" size="20%">
     <input type="text" size="20%">
-    <input type="button" value="Сохранить" id="add_but">
+    <input type="button" value="Добавить" id="add_but">
     <input type="button" value="Отменить" id="cancel_add_but">
 </div>
 <script type="text/javascript">
@@ -70,23 +69,24 @@
         $('#add_div').slideToggle(200);
 
     }
-    $('button.edit[value=this.attr("value")]','#test_tbl','#test_tbl').click(function (){
-
-        tr = $(this).parent().parent();
-
-        for(var i=0; i<5; i++)
-
-        $('input:eq('+i+')','#edit_div').val($('td:eq('+i+')',tr).text());
-
-        edit_appearence();
+    $('button[id^="edit"]').click(function () {
+       editTableString();
 
     });
+    function editTableString()
+    {
+        edit_appearence();
+        tr = $(this).parent().parent();
+        for (var i = 0; i < 5; i++)
 
-    $('button.del[value=this.attr("value")]','#test_tbl').click(function (){
-
-
+            $('input:eq(' + i + ')', '#edit_div').val($('td:eq(' + i + ')', tr).text());
+    }
+    function delTableString()
+    {
         if(!confirm("Delete?")) return;
         $(this).parent().parent().remove();
+    }
+    $('button[id^="del"]').click(function (){
 
     });
 
@@ -112,19 +112,18 @@
     })
     $('#add_but','#add_div').click(function(){
         $('#add').slideToggle(200);
-        add_appearence();
-        var tr='<tr>';
+        var opa='<tr>';
         for (var i=0;i<5;i++)
-            tr=tr+ '<td class="cellStyle">'+$('input:eq('+i+')','#add_div').val()+'</td>';
-        var buttonValue=parseInt($('button.edit:last').attr("value"))+1;
-        tr=tr+'<td class="cellStyle"><button class="edit" value="'
-                +buttonValue +'">edit</button> <button class="del" value="'
-                +buttonValue +'">del</button></td>'+'</tr>';
-        $('tr:last').after(tr);
+            opa=opa+"<td class='cellStyle'>"+$('input:eq('+i+')','#add_div').val()+"</td>";
+        opa=opa+"<td class='cellStyle'><button class='edit'>edit</button></td><td class='cellStyle'> <button class='del'>del</button></td>"+"</tr>";
+        var lol=$(opa);
+        lol.find('.edit').bind('click',editTableString);
+        lol.find('.del').bind('click',delTableString);
+        $("#test_tbl").last().append(lol);
+        add_appearence();
 
     })
 
 </script>
-}
 </body>
 </html>
