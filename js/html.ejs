@@ -5,12 +5,20 @@
 </head>
 <body>
 <table id="main_table" border="1" style="width:100%">
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Type</th>
+        <th>Value</th>
+        <th>Deletion</th>
+    </tr>
     <? table.forEach(function(row){ ?>
     <tr>
         <td><input style="width:100%" type="text" value="<?=row.Id[0]?>"></td>
         <td><input style="width:100%" type="text" value="<?= row.Name[0] ?>"></td>
         <td><input style="width:100%" type="text" value="<?= row.Description[0] ?>"></td>
-        <td><select style="width:100%">
+        <td><select style="width:100%" class="typeSelection">
                 <option <?= (row.Type[0] == "System.String" ? "selected" : "") ?>>System.String</option>
                 <option <?= (row.Type[0] == "System.Int32" ? "selected" : "") ?>>System.Int32</option>
                 <option <?= (row.Type[0] == "System.Boolean" ? "selected" : "") ?>>System.Boolean</option>
