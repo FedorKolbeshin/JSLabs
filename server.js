@@ -23,14 +23,6 @@ http.createServer(function (req, res) {
             }
         );
     }
-    else if (req.url == '/getThatBitch') {
-        console.log("таки мы здесь сучка!");
-        res.url='http://127.0.0.1:1337/index.html';
-        res.writeHead(200,{'Access-Control-Allow-Origin':'*'});
-        console.log("нихуя запрос пришел");
-        res.end(rawJSON);
-
-    }
     else if (req.url == '/client.js')
     {
         fs.readFile('js/client.js',function(err,js){
@@ -43,7 +35,7 @@ http.createServer(function (req, res) {
     else
     {
         res.writeHead(200, {"Content-Type": 'text/html'});
-        res.end("Дружок, чет ты заблудился походу, я не знаю ту байду, которую ты мне тут втираешь!");
+        res.end("Дружок, чет ты заблудился походу, такого адреса не существует!");
     }
 
 }).listen(process.env.PORT);
