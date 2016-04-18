@@ -9,13 +9,13 @@ http.createServer(function (req, res) {
     console.log(req.url);
     console.log("нихуя пришел запрос");
     if (req.url=='/') {
-        fs.readFile('../js/html.ejs', 'utf-8', function (err, html) {
+        fs.readFile('js/html.ejs', 'utf-8', function (err, html) {
                 if (err) {
                     throw err;
                 }
             console.log("index.ejs was read successfully!");
             console.log(html);
-                var table = loadXMLDoc("../xml/input.xml").Parameters.Parameter;
+                var table = loadXMLDoc("xml/input.xml").Parameters.Parameter;
             console.log(table);
                 res.writeHead(200,
                 {'Content-Type': 'text/html; charset=utf-8'});
@@ -33,15 +33,20 @@ http.createServer(function (req, res) {
     }
     else if (req.url == '/client.js')
     {
-        fs.readFile('../js/client.js',function(err,js){
+        fs.readFile('js/client.js',function(err,js){
             if (err){
                 throw err;
             }
             res.end(js);
         })
     }
+    else
+    {
+        res.writeHead(200, {"Content-Type": 'text/html'});
+        res.end("Дружок, чет ты заблудился походу, я не знаю ту байду, которую ты мне тут втираешь!");
+    }
 
-}).listen(1337,'127.0.0.1');
+}).listen(process.env.PORT);
 function loadXMLDoc(filePath) {
     var json;
     try {
@@ -55,7 +60,7 @@ function loadXMLDoc(filePath) {
     } catch (ex) {console.log(ex)}
 }
 var returnJSONResults = function(baseName, queryName) {
-    var XMLPath = "../xml/input.xml";
+    var XMLPath = "xml/input.xml";
 var rawJSON = loadXMLDoc(XMLPath);
 function loadXMLDoc(filePath) {
     var fs = require('fs');
