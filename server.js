@@ -3,72 +3,85 @@
  */
 var fs = require('fs'),
     http=require('http'),
-    xml2js = require('xml2js'),
+    parseString = require('xml2js').parseString,
+    js2xmlparser=require('js2xmlparser'),
+    currentPage;
     ejs = require('ejs');
+renderCurrentPage();
 http.createServer(function (req, res) {
     console.log(req.url);
     console.log("нихуя пришел запрос");
-    if (req.url=='/') {
-        fs.readFile('js/html.ejs', 'utf-8', function (err, html) {
-                if (err) {
-                    throw err;
-                }
-            console.log("index.ejs was read successfully!");
-            console.log(html);
-                var table = loadXMLDoc("xml/input.xml").Parameters.Parameter;
-            console.log(table);
-                res.writeHead(200,
-                {'Content-Type': 'text/html; charset=utf-8'});
-                 res.end(ejs.render(html, {table: table}, {delimiter: '?'}));
-            }
-        );
+    if (req.url == '/') {
+        res.setHeader('Content-Type', 'text/html; charset=utf-8');
+        res.end(currentPage);
+
     }
-    else if (req.url == '/client.js')
+    else if (req.url == '/saveXML')
     {
-        fs.readFile('js/client.js',function(err,js){
-            if (err){
+        var incomeJSON;
+        req.on('data',function(data){
+            incomeJSON=data.toString();
+            console.log(incomeJSON);
+        })
+        req.on('end',function(){
+            var newXML = js2xmlparser("Parameters", {Parameter: JSON.parse(incomeJSON)});
+            fs.writeFile(__dirname + '/xml/input.xml', newXML, function(err) {
+                if(err) {
+                    res.end("что то пошло не так");
+                    console.log(err);
+                } else {
+                    res.end("Успех");
+                    renderCurrentPage();
+                    console.log("Файл сохранен.");
+                }
+            });
+        })
+    }
+    else if (req.url == '/client.js') {
+        fs.readFile('js/client.js', function (err, js) {
+            if (err) {
                 throw err;
             }
             res.end(js);
         })
     }
-    else
-    {
+    else {
         res.writeHead(200, {"Content-Type": 'text/html'});
         res.end("Дружок, чет ты заблудился походу, такого адреса не существует!");
     }
 
-}).listen(process.env.PORT);
-function loadXMLDoc(filePath) {
-    var json;
-    try {
-        var fileData = fs.readFileSync(filePath, 'ascii');
-        var parser = new xml2js.Parser();
-        parser.parseString(fileData.substring(0, fileData.length), function (err, result) {
-            json =result;
-        });
-        console.log("File '" + filePath + "/ was successfully read.\n");
-        return json;
-    } catch (ex) {console.log(ex)}
-}
-var returnJSONResults = function(baseName, queryName) {
-    var XMLPath = "xml/input.xml";
-var rawJSON = loadXMLDoc(XMLPath);
-function loadXMLDoc(filePath) {
-    var fs = require('fs');
-    var xml2js = require('xml2js');
-    var json;
-    try {
-        var fileData = fs.readFileSync(filePath, 'ascii');
+//}).listen(process.env.PORT);
+}).listen(1337,'127.0.0.1');
+function renderCurrentPage() {
+    fs.readFile(__dirname + '/xml/input.xml', function(err, data) {
+        parseString(data, function (err, result) {
+            try {
+                result = result.Parameters.Parameter;
+            } catch(err) {
+                getCurrentException("Некорректные данные в input.xml", err);
+                return;
+            }
 
-        var parser = new xml2js.Parser();
-        parser.parseString(fileData.substring(0, fileData.length), function (err, result) {
-            json = JSON.stringify(result);
-            /*console.log(JSON.stringify(result));*/
+            fs.readFile(__dirname +'/js/html.ejs', 'utf-8', function(error, content) {
+                if (error) {
+                    getCurrentException("Ошибка при чтении html.ejs", error);
+                    return;
+                }
+
+                try {
+                    currentPage = ejs.render(content, {table: result}, {delimiter: '?'});
+                } catch(err) {
+                    getCurrentException("Ошибка при рендеринге. Проверьте правильность передаваемых данных в html.ejs", err);
+                }
+            });
         });
-        console.log("File '" + filePath + "/ was successfully read.\n");
-        return json;
-    } catch (ex) {console.log(ex)}
+    });
 }
-console.log(rawJSON);
-}();
+
+function getCurrentException(mes, err) {
+    currentPage = "Что-то пошло не так, братан!";
+    console.log("------------------------------------------------------------------------------------");
+    console.log(mes);
+    console.log(err);
+    console.log("------------------------------------------------------------------------------------");
+}

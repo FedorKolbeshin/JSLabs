@@ -20,7 +20,49 @@ document.addEventListener("DOMContentLoaded", function(){
     });
     $(".remove_row").click(function(){
         removeRow();
-    })
+    });
+    $("#saveData").click(function(){
+        console.log("--------------------------------------------");
+       var result=[],
+           rows=$("#main_table tr");
+        [].forEach.call(rows,function(item,index) {
+            var itemElements =item.children,
+                itemValue = itemElements[4].firstElementChild,
+                selectType = getSelectionValue(itemElements[3].firstElementChild),
+                selectValue = selectType == "System.Boolean" ? itemValue.checked : itemValue.value;
+            result.push({
+             Id: itemElements[0].firstElementChild.value,
+             Name: itemElements[1].firstElementChild.value,
+             Description: itemElements[2].firstElementChild.value,
+             Type: selectType,
+             Value: selectValue
+             });
+
+        });
+        $.ajax({
+            type:"POST",
+            url:"/saveXML",
+            data:JSON.stringify(result),
+            success:function(response)
+            {
+                alert(response);
+            }}
+        )
+
+
+    });
+    function getSelectionValue(selectValue)
+    {
+        var options=selectValue.children;
+        for (var i=0;i<options.length;i++)
+        {
+            if (options[i].selected)
+            {
+                return options[i].innerHTML;
+            }
+
+        }
+    }
     function removeRow() {
         $(event.target).parent().parent().remove();
     };

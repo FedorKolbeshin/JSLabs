@@ -15,7 +15,7 @@
                 <option <?= (row.Type[0] == "System.Int32" ? "selected" : "") ?>>System.Int32</option>
                 <option <?= (row.Type[0] == "System.Boolean" ? "selected" : "") ?>>System.Boolean</option>
             </select></td>
-        <td><input style="width:100%" type="<?= row.Type[0] == 'System.Boolean' ? 'checkbox' : 'text' ?>" <?= (row.Type[0] == "System.Boolean" && row.Value[0] == "True" ? "checked" : "value=" + row.Value[0] ) ?>></td>
+        <td><input style="width:100%" type="<?= row.Type[0] == 'System.Boolean' ? 'checkbox' : 'text' ?>" <?= (row.Type[0] == "System.Boolean" && row.Value[0].toLowerCase() == "true" ? "checked" : "value=" + row.Value[0] ) ?>></td>
         <td><button style="width:100%" class="remove_row">delete</button></td>
     </tr>
     <? }) ?>
