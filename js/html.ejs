@@ -23,11 +23,13 @@
                 <option <?= (row.Type[0] == "System.Int32" ? "selected" : "") ?>>System.Int32</option>
                 <option <?= (row.Type[0] == "System.Boolean" ? "selected" : "") ?>>System.Boolean</option>
             </select></td>
-        <td><input style="width:100%" type="<?= row.Type[0] == 'System.Boolean' ? 'checkbox' : 'text' ?>" <?= (row.Type[0] == "System.Boolean" && row.Value[0].toLowerCase() == "true" ? "checked" : "value=" + row.Value[0] ) ?>></td>
+        <td><input style="width:100%" type="<?= row.Type[0] == 'System.Boolean' ? 'checkbox' : 'text' ?>"
+                   name="<?= row.Type[0] == 'System.Int32' ? 'number' : 'text' ?>"<?= (row.Type[0] == "System.Boolean" && row.Value[0].toLowerCase() == "true" ? "checked" : "value=" + row.Value[0] ) ?>></td>
         <td><button style="width:100%" class="remove_row">delete</button></td>
     </tr>
     <? }) ?>
 </table>
 <button style="width:25%" id="addString">Add string</button> <button id="saveData" style="width:25%">Save data</button>
+<div class="errorClass" style="width:100%;  background-color:red;"></br>SDDDDDDDDDDDDDDDDDDDDDD</br>asdasdasdasdasd</div>
 </body>
 </html>
