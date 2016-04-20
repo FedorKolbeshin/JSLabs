@@ -2,12 +2,12 @@
  * Created by fReDDy on 17.04.2016.
  */
 document.addEventListener("DOMContentLoaded", function(){
+    var mode;
     $(document).ready(function(){
-        console.dir($("input")[0].style);
         $(".stringError")[0].hidden=true;
-        console.dir($(".stringError"));
         $(".intError")[0].hidden=true;
         $(".boolError")[0].hidden=true;
+        $(".emptyError")[0].hidden=true;
     });
     $("#addString").click(function() {
         var tr = '<tr>';
@@ -25,6 +25,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
         trObject.find('.typeSelection').bind('change', changeSelectHandler);
         trObject.find('.remove_row').bind('click', removeRow);
+        trObject.find('.value_Class').bind('keydown', KeyDownHandling);
         trObject.find('.value_Class').bind('keyup', KeyUpHandling);
         $("#main_table").last().append(trObject);
 
@@ -32,98 +33,137 @@ document.addEventListener("DOMContentLoaded", function(){
     $(".remove_row").click(function(){
         removeRow();
     });
-    $("input[type='checkbox']").click(function(){
-        var trueCount=0;
-        [].forEach.call($("input[type='checkbox']"),function(item){
-            if (item.checked)
-            {
-                trueCount++;
-            }
-        });
-        if (trueCount == 0)
-        {
-            $(".boolError").show("slow");
-            $(".boolError")[0].accessKey="visible";
-        }
-        else {
-            $(".boolError").hide("slow");
-            $(".boolError")[0].accessKey="hidden";
-        }
+    $(".value_Class").keydown(KeyDownHandling);
+    function KeyDownHandling() {
+        if (this.name == "number") {
+            if (+event.keyCode == 17) {
+                mode = "ctrl";
 
-    });
-    $(".value_Class").keyup(KeyUpHandling);
-    function KeyUpHandling() {
-        var bool=KeyUpFunction(this);
-        if (bool) return true;
-        else return false;
-    }
-    function KeyUpFunction (currentEvent)
-    {
-        if (currentEvent.name == "text") {
-            if (currentEvent.value.length > 10) {
-                currentEvent.style.borderColor = 'red';
-                $(".stringError").show("slow");
-                $(".stringError")[0].accessKey="visible";
+            };
+            if (+event.keyCode == 16 )
+            {
+                mode="shift";
                 return false;
             }
-            else {
-                currentEvent.style.borderColor = 'green';
-                $(".stringError").hide("slow");
-                $(".stringError")[0].accessKey="hidden";
+            if (+event.keyCode == 189)
+            {
+                if(this.value.length == 0)
+                    return true;
+                else return false;
+            }
+            if (+event.keyCode == 8)
+            {
                 return true;
             }
+            if (+event.keyCode >= 48 && +event.keyCode <= 57  || +event.keyCode == 189)  {
+                if (mode == "shift")
+                {
+                    return false;
+                }
+                else
+                {
+                    if (this.value == '0')
+                    {
+                        return false;
+                    }
+                    if (+event.keyCode == 48) {
+                        if (this.value.length == 1 && this.value[0] == '0' || this.value[0] == '-' && this.value.length == 1 )
+                            return false;
+                    }
+                    if (this.style.borderColor == "red") {
+                        if (this.value.length == 0) {
+                            $(".emptyError").hide("slow");
+                            $(".intError").hide("slow");
+                            this.style.borderColor = null;
+                        }
+
+                    }
+                    return true;
+                };
+            }
+            else {
+                if (+event.keyCode == 86 && mode == "ctrl") {
+                    return true;
+                }
+                ctrlKey = false;
+                return false;
+            }
         }
-        if (currentEvent.name == "number") {
-            var bool = checkIntForValidValue(currentEvent);
-            if (bool) return true;
-            else return false;
-        }
-    }
-    function checkIntForValidValue(currentEvent)
+        else return true;
+    };
+    $(".value_Class").keyup(function(event){
+        KeyUpHandling(event,this);
+    });
+    function KeyUpHandling(event,obj)
     {
-        if (currentEvent.value[0] == "-" && currentEvent.value[1] == "0") {
-            currentEvent.style.borderColor='red';
-            $(".intError").show("slow");
-            $(".intError")[0].accessKey="visible";
-            return false;
-        }
-        //console.log("стала длина: "+this.value.length);
-        if (+currentEvent.value <= 256 && +currentEvent.value >= -256 &&
-            currentEvent.value.length !=0 && !(+currentEvent.value[0] == 0 && currentEvent.value.length > 1))
+        if (mode == "ctrl")
         {
-            currentEvent.style.borderColor='green';
-            $(".intError").hide("slow");
-            $(".intError")[0].accessKey="hidden";
-            return true;
+            if (isNaN(+this.value) || obj.value[0] =='0')
+            {
+                $(".intError").show("slow");
+                obj.style.borderColor="red";
+            }
+            else
+            {
+                obj.style.borderColor=null;
+                $(".intError").hide("slow");
+            }
+            mode="none";
         }
-        else if (currentEvent.value.length == 0)
+        if (+event.keyCode == 16)
         {
-            $(".intError").show("slow");
-            $(".intError")[0].accessKey="visible";
-            currentEvent.style.borderColor='red'
-            return false;
+            mode="none";
         }
-        else
-        {
-            $(".intError").show("slow");
-            $(".intError")[0].accessKey="visible";
-            currentEvent.style.borderColor='red';
-            return false;
-        }
+        //if (this.value[0] == "-" && this.value[1] == "0") {
+        //    this.value[1] = "";
+        //}
     }
     $("#saveData").click(function(){
-        console.log("--------------------------------------------");
        var result=[],
            rows=$("#main_table tr"),
-           bool=true;
-        [].forEach.call($("div[type='errorDiv']"),function(item){
-           if (item.accessKey == "visible")
-           {
+           bool=true,
+           onechecked=false;
+        [].forEach.call($("input.value_Class"),function(item){
+            if (item.name == "text")
+            {
+                if (item.value.length > 10)
+                {
+                    bool=false;
+                    item.style.borderColor="red";
+                    $(".stringError").show("slow");
+                }
+            }
+            if (item.name == "number")
+            {
 
-               bool=false;
-           }
+                if (+item.value<-256 || +item.value >256 || isNaN(+item.value)
+                    || item.value[0] == '0' && item.value.length > 1 )
+                {
+                    bool=false;
+                    item.style.borderColor="red";
+                    $(".intError").show("slow");
+                }
+            }
+            if (item.value == "")
+            {
+                item.style.borderColor="red";
+                $(".emptyError").show("slow");
+                bool=false;
+            }
+
         });
-        if (bool) {
+        [].forEach.call($('input[type="checkbox"]'),function(item){
+            if (item.checked)
+                onechecked=true;
+        });
+        if (!onechecked)
+        {
+            $(".boolError").show("slow");
+            return;
+
+        }
+        if (bool && onechecked) {
+            clearValueInput();
             [].forEach.call(rows, function (item, index) {
                 if (index != 0) {
                     var itemElements = item.children,
@@ -145,32 +185,38 @@ document.addEventListener("DOMContentLoaded", function(){
                     url: "/saveXML",
                     data: JSON.stringify(result),
                     success: function (response) {
-                        alert(response);
+                        console.dir($("savedata"));
+
+                        console.log(response);
                     }
                 }
             )
         }
-        else alert("неправильные данные!!!");
-
-
     });
+    function clearValueInput() {
+        [].forEach.call($("input.value_Class"), function (item) {
+            item.style.borderColor = "";
+        });
+        $(".stringError").hide("slow");
+        $(".intError").hide("slow");
+        $(".boolError").hide("slow");
+    };
     $(".typeSelection").change(changeSelectHandler);
     function changeSelectHandler() {
         if ($("option:selected", this).text() == 'System.Boolean') {
-           $(".boolError").hide();
             $(this).parent().next()[0].children[0].type = 'checkbox';
+            $(this).parent().next()[0].children[0].name="";
         }
         else {
-            var currentInput = $(this).parent().next()[0].children[0];
             if (this.selectedIndex == '0') {
-                currentInput.name = 'text';
+                $(this).parent().next()[0].children[0].name = 'text';
+                $(this).parent().next()[0].children[0].defaultValue="text";
             }
             else if (this.selectedIndex == '1') {
-                currentInput.name = 'number';
+                $(this).parent().next()[0].children[0].name = 'number';
+                $(this).parent().next()[0].children[0].defaultValue='0';
             }
-            currentInput.type = 'text';
-            currentInput.value = "";
-            checkIntForValidValue(currentInput);
+            $(this).parent().next()[0].children[0].type = 'text';
         }
     }
     function getSelectionValue(selectValue)

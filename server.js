@@ -9,32 +9,33 @@ var fs = require('fs'),
     ejs = require('ejs');
 renderCurrentPage();
 http.createServer(function (req, res) {
-    console.log(req.url);
-    console.log("нихуя пришел запрос");
     if (req.url == '/') {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
         res.end(currentPage);
-
     }
     else if (req.url == '/saveXML')
     {
         var incomeJSON;
         req.on('data',function(data){
             incomeJSON=data.toString();
-            console.log(incomeJSON);
+            if (incomeJSON == "[]")
+            res.end("ай ай ай дружок, че ты мне пустые данные то шлешь?");
         })
         req.on('end',function(){
-            var newXML = js2xmlparser("Parameters", {Parameter: JSON.parse(incomeJSON)});
-            fs.writeFile(__dirname + '/xml/input.xml', newXML, function(err) {
-                if(err) {
-                    res.end("что то пошло не так");
-                    console.log(err);
-                } else {
-                    res.end("Успех");
-                    renderCurrentPage();
-                    console.log("Файл сохранен.");
-                }
-            });
+            if (incomeJSON != "[]") {
+                var newXML = js2xmlparser("Parameters", {Parameter: JSON.parse(incomeJSON)});
+                fs.writeFile(__dirname + '/xml/input.xml', newXML, function (err) {
+                    if (err) {
+                        res.end("что то пошло не так");
+                        console.log(err);
+                    } else {
+                        res.end("Успех");
+                        renderCurrentPage();
+                        console.log("Файл сохранен.");
+                    }
+                });
+            }
+            else res.end("ай ай ай дружок, че ты мне пустые данные то шлешь?");
         })
     }
     else if (req.url == '/client.js') {
@@ -46,6 +47,7 @@ http.createServer(function (req, res) {
         })
     }
     else {
+        console.log(req.url);
         res.writeHead(200, {"Content-Type": 'text/html'});
         res.end("Дружок, чет ты заблудился походу, такого адреса не существует!");
     }
