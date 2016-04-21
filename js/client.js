@@ -143,6 +143,7 @@ document.addEventListener("DOMContentLoaded", function(){
                     item.style.borderColor="red";
                     $(".intError").show("slow");
                 }
+
             }
             if (item.value == "")
             {
@@ -159,7 +160,6 @@ document.addEventListener("DOMContentLoaded", function(){
         if (!onechecked)
         {
             $(".boolError").show("slow");
-            return;
 
         }
         if (bool && onechecked) {
@@ -180,19 +180,25 @@ document.addEventListener("DOMContentLoaded", function(){
                 }
 
             });
+            console.dir($("savedata"));
             $.ajax({
                     type: "POST",
                     url: "/saveXML",
                     data: JSON.stringify(result),
                     success: function (response) {
-                        console.dir($("savedata"));
-
-                        console.log(response);
+                        animateColor("green");
                     }
                 }
             )
         }
+        else animateColor("red");
     });
+    function animateColor(currentColor){
+        $("button#savedata")[0].style.backgroundColor=currentColor;
+        setTimeout(function(){
+            $("button#savedata")[0].style.backgroundColor=null;
+        },1000);
+    }
     function clearValueInput() {
         [].forEach.call($("input.value_Class"), function (item) {
             item.style.borderColor = "";
