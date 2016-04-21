@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function(){
     {
         if (mode == "ctrl")
         {
-            if (isNaN(+this.value) || obj.value[0] =='0')
+            if (isNaN(+obj.value) || obj.value[0] =='0')
             {
                 $(".intError").show("slow");
                 obj.style.borderColor="red";
