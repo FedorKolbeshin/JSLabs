@@ -102,7 +102,10 @@ document.addEventListener("DOMContentLoaded", function(){
                             return false;
                         }
                     }
-                    return true;
+                    if (currentEvent.selectionStart == 0 && currentEvent.value[0] =='-') {
+                        return false;
+                    }
+                    else return true;
                 }
             }
             else  return false;
