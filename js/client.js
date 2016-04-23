@@ -4,10 +4,10 @@
 document.addEventListener("DOMContentLoaded", function(){
     var mode;
     $(document).ready(function(){
-        $(".stringError")[0].hidden=true;
-        $(".intError")[0].hidden=true;
-        $(".boolError")[0].hidden=true;
-        $(".emptyError")[0].hidden=true;
+        $("#stringError")[0].hidden=true;
+        $("#intError")[0].hidden=true;
+        $("#boolError")[0].hidden=true;
+        $("#emptyError")[0].hidden=true;
     });
     $("#addString").click(function() {
         var tr = '<tr>';
@@ -25,99 +25,96 @@ document.addEventListener("DOMContentLoaded", function(){
 
         trObject.find('.typeSelection').bind('change', changeSelectHandler);
         trObject.find('.remove_row').bind('click', removeRow);
-        trObject.find('.value_Class').bind('keydown', KeyDownHandling);
-        trObject.find('.value_Class').bind('keyup', KeyUpHandling);
+        trObject.find('.value_Class').bind('paste',function(event) {
+            return PasteHandling(this,event);
+        });
+        trObject.find('.value_Class').bind('keydown', function(event) {
+            return KeyDownHandling(this,event);
+        });
+        trObject.find('.value_Class').bind('keyup', function(event){
+            if (+event.keyCode == 16)
+            {
+                mode="none";
+            }
+        });
         $("#main_table").last().append(trObject);
 
     });
     $(".remove_row").click(function(){
         removeRow();
     });
-    $(".value_Class").keydown(KeyDownHandling);
-    function KeyDownHandling() {
-        if (this.name == "number") {
-            if (+event.keyCode == 17) {
-                mode = "ctrl";
-
-            };
-            if (+event.keyCode == 16 )
-            {
-                mode="shift";
-                return false;
+    $(".value_Class").on('paste',function(event)
+    {
+        PasteHandling(this,event);
+    });
+    function PasteHandling(currentEvent,event){
+        if (currentEvent.name !="text") {
+            var newValue = currentEvent.value.slice(0, currentEvent.selectionStart) +
+                event.originalEvent.clipboardData.getData('text/plain') +
+                currentEvent.value.slice(currentEvent.selectionEnd);
+            if (isNaN(+newValue) || newValue[0] == '-' && newValue[1] == '0'
+                || newValue[0] =='0' && newValue.length >1) {
+                if (newValue!='-')
+                    event.preventDefault();
             }
-            if (+event.keyCode == 189)
-            {
-                if(this.value.length == 0)
-                    return true;
-                else return false;
-            }
-            if (+event.keyCode == 8)
+        }
+    }
+    $(".value_Class").on('keydown',function(event){
+        return KeyDownHandling(this,event);
+    });
+    function KeyDownHandling(currentEvent,event){
+        if (currentEvent.name == "number") {
+            if (event.ctrlKey)
             {
                 return true;
             }
-            if (+event.keyCode >= 48 && +event.keyCode <= 57  || +event.keyCode == 189)  {
-                if (mode == "shift")
+            if (+event.keyCode == 16) {
+                mode = "shift";
+                return false;
+            }
+            if (+event.keyCode == 189) {
+                var newValue = currentEvent.value.slice(0, currentEvent.selectionStart) +
+                    '-' +
+                    currentEvent.value.slice(currentEvent.selectionEnd);
+                if (!isNaN(newValue) || currentEvent.value.length == 0)
                 {
+                    return true;
+                }
+                else return false;
+            }
+            if (+event.keyCode == 8) {
+                return true;
+            }
+            if (+event.keyCode >= 48 && +event.keyCode <= 57 || +event.keyCode == 189) {
+                if (mode == "shift") {
                     return false;
                 }
-                else
-                {
-                    if (this.value == '0')
-                    {
+                else {
+                    if (currentEvent.value == '0') {
                         return false;
                     }
                     if (+event.keyCode == 48) {
-                        if (this.value.length == 1 && this.value[0] == '0' || this.value[0] == '-' && this.value.length == 1 )
+                        if (+currentEvent.selectionStart == 0 && (currentEvent.value.length !=0)
+                            || currentEvent.value.length == 1 && currentEvent.value[0] == '0'
+                            || currentEvent.value[0] == '-' && currentEvent.selectionStart == 1) {
+                            console.log("-------------------");
+                            console.log(currentEvent.value.length);
                             return false;
-                    }
-                    if (this.style.borderColor == "red") {
-                        if (this.value.length == 0) {
-                            $(".emptyError").hide("slow");
-                            $(".intError").hide("slow");
-                            this.style.borderColor = null;
                         }
-
                     }
-                    return true;
-                };
-            }
-            else {
-                if (+event.keyCode == 86 && mode == "ctrl") {
                     return true;
                 }
-                ctrlKey = false;
-                return false;
             }
+            else  return false;
         }
         else return true;
-    };
+    }
     $(".value_Class").keyup(function(event){
-        KeyUpHandling(event,this);
-    });
-    function KeyUpHandling(event,obj)
-    {
-        if (mode == "ctrl")
-        {
-            if (isNaN(+obj.value) || obj.value[0] =='0')
-            {
-                $(".intError").show("slow");
-                obj.style.borderColor="red";
-            }
-            else
-            {
-                obj.style.borderColor=null;
-                $(".intError").hide("slow");
-            }
-            mode="none";
-        }
         if (+event.keyCode == 16)
         {
             mode="none";
         }
-        //if (this.value[0] == "-" && this.value[1] == "0") {
-        //    this.value[1] = "";
-        //}
-    }
+    });
     $("#saveData").click(function(){
        var result=[],
            rows=$("#main_table tr"),
@@ -130,7 +127,7 @@ document.addEventListener("DOMContentLoaded", function(){
                 {
                     bool=false;
                     item.style.borderColor="red";
-                    $(".stringError").show("slow");
+                    $("#stringError").show("slow");
                 }
             }
             if (item.name == "number")
@@ -141,14 +138,14 @@ document.addEventListener("DOMContentLoaded", function(){
                 {
                     bool=false;
                     item.style.borderColor="red";
-                    $(".intError").show("slow");
+                    $("#intError").show("slow");
                 }
 
             }
             if (item.value == "")
             {
                 item.style.borderColor="red";
-                $(".emptyError").show("slow");
+                $("#emptyError").show("slow");
                 bool=false;
             }
 
@@ -159,7 +156,7 @@ document.addEventListener("DOMContentLoaded", function(){
         });
         if (!onechecked)
         {
-            $(".boolError").show("slow");
+            $("#boolError").show("slow");
 
         }
         if (bool && onechecked) {
@@ -203,9 +200,10 @@ document.addEventListener("DOMContentLoaded", function(){
         [].forEach.call($("input.value_Class"), function (item) {
             item.style.borderColor = "";
         });
-        $(".stringError").hide("slow");
-        $(".intError").hide("slow");
-        $(".boolError").hide("slow");
+        $("#emptyError").hide("slow");
+        $("#stringError").hide("slow");
+        $("#intError").hide("slow");
+        $("#boolError").hide("slow");
     };
     $(".typeSelection").change(changeSelectHandler);
     function changeSelectHandler() {
@@ -217,10 +215,12 @@ document.addEventListener("DOMContentLoaded", function(){
             if (this.selectedIndex == '0') {
                 $(this).parent().next()[0].children[0].name = 'text';
                 $(this).parent().next()[0].children[0].defaultValue="text";
+                $(this).parent().next()[0].children[0].value="text";
             }
             else if (this.selectedIndex == '1') {
                 $(this).parent().next()[0].children[0].name = 'number';
                 $(this).parent().next()[0].children[0].defaultValue='0';
+                $(this).parent().next()[0].children[0].value='0';
             }
             $(this).parent().next()[0].children[0].type = 'text';
         }

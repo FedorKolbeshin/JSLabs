@@ -46,6 +46,14 @@ http.createServer(function (req, res) {
             res.end(js);
         })
     }
+    else if (req.url == '/main_styles.css') {
+        fs.readFile('js/main_styles.css', function (err, css) {
+            if (err) {
+                throw err;
+            }
+            res.end(css);
+        })
+    }
     else {
         console.log(req.url);
         res.writeHead(200, {"Content-Type": 'text/html'});
