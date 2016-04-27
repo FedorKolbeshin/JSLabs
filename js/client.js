@@ -2,12 +2,13 @@
  * Created by fReDDy on 17.04.2016.
  */
 document.addEventListener("DOMContentLoaded", function(){
-    var mode;
+    var inputError;
     $(document).ready(function(){
         $("#stringError")[0].hidden=true;
         $("#intError")[0].hidden=true;
         $("#boolError")[0].hidden=true;
         $("#emptyError")[0].hidden=true;
+        $("#pasteError")[0].hidden=true;
     });
     $("#addString").click(function() {
         var tr = '<tr>';
@@ -25,27 +26,28 @@ document.addEventListener("DOMContentLoaded", function(){
 
         trObject.find('.typeSelection').bind('change', changeSelectHandler);
         trObject.find('.remove_row').bind('click', removeRow);
-        trObject.find('.value_Class').bind('paste',function(event) {
-            return PasteHandling(this,event);
+        trObject.find('.value_Class').bind('paste', function (event) {
+            return PasteHandling(this, event);
         });
-        trObject.find('.value_Class').bind('keydown', function(event) {
-            return KeyDownHandling(this,event);
+        trObject.find('.value_Class').bind('keypress', function (event) {
+            return KeyPressHandling(this, event);
         });
-        trObject.find('.value_Class').bind('keyup', function(event){
-            if (+event.keyCode == 16)
-            {
-                mode="none";
-            }
+        trObject.find('.value_Class').bind('keyup', function (event) {
+
         });
         $("#main_table").last().append(trObject);
-
     });
     $(".remove_row").click(function(){
         removeRow();
     });
+    $(".value_Class").on('focus',function(){
+        if (this.style.borderColor == "red") {
+            this.style.borderColor = "";
+        }
+    })
     $(".value_Class").on('paste',function(event)
     {
-        PasteHandling(this,event);
+        return PasteHandling(this,event);
     });
     function PasteHandling(currentEvent,event){
         if (currentEvent.name !="text") {
@@ -54,70 +56,52 @@ document.addEventListener("DOMContentLoaded", function(){
                 currentEvent.value.slice(currentEvent.selectionEnd);
             if (isNaN(+newValue) || newValue[0] == '-' && newValue[1] == '0'
                 || newValue[0] =='0' && newValue.length >1) {
-                if (newValue!='-')
-                    event.preventDefault();
+                currentEvent.style.borderColor="red";
+                inputError=currentEvent;
+                $("#pasteError").fadeIn(1000);
+                $("#pasteError").fadeOut(1000);
+                event.preventDefault();
             }
         }
+        return true;
     }
-    $(".value_Class").on('keydown',function(event){
-        return KeyDownHandling(this,event);
-    });
-    function KeyDownHandling(currentEvent,event){
+    $(".value_Class").on('keypress',function(event){
+        return KeyPressHandling(this,event);
+    })
+    function KeyPressHandling(currentEvent,event) {
+        console.log(event.which);
         if (currentEvent.name == "number") {
-            if (event.ctrlKey)
-            {
-                return true;
-            }
-            if (+event.keyCode == 16) {
-                mode = "shift";
-                return false;
-            }
-            if (+event.keyCode == 189) {
+            if (String.fromCharCode(event.which) == '-') {
                 var newValue = currentEvent.value.slice(0, currentEvent.selectionStart) +
                     '-' +
                     currentEvent.value.slice(currentEvent.selectionEnd);
-                if (!isNaN(newValue) || currentEvent.value.length == 0)
-                {
+                if (!isNaN(newValue) || currentEvent.value.length == 0) {
                     return true;
                 }
                 else return false;
             }
-            if (+event.keyCode == 8) {
-                return true;
-            }
-            if (+event.keyCode >= 48 && +event.keyCode <= 57 || +event.keyCode == 189) {
-                if (mode == "shift") {
+            if (+event.keyCode >= 48 && +event.keyCode <= 57) {
+                if (currentEvent.value == '0') {
+                    return false;
+                }
+                if (+event.keyCode == 48) {
+                    if (+currentEvent.selectionStart == 0 && (currentEvent.value.length != 0)
+                        || currentEvent.value.length == 1 && currentEvent.value[0] == '0'
+                        || currentEvent.value[0] == '-' && currentEvent.selectionStart == 1) {
+                        return false;
+                    }
+                }
+                if (currentEvent.selectionStart == 0 && currentEvent.selectionEnd == 0 && currentEvent.value[0] == '-') {
                     return false;
                 }
                 else {
-                    if (currentEvent.value == '0') {
-                        return false;
-                    }
-                    if (+event.keyCode == 48) {
-                        if (+currentEvent.selectionStart == 0 && (currentEvent.value.length !=0)
-                            || currentEvent.value.length == 1 && currentEvent.value[0] == '0'
-                            || currentEvent.value[0] == '-' && currentEvent.selectionStart == 1) {
-                            console.log("-------------------");
-                            console.log(currentEvent.value.length);
-                            return false;
-                        }
-                    }
-                    if (currentEvent.selectionStart == 0 && currentEvent.value[0] =='-') {
-                        return false;
-                    }
-                    else return true;
+                    return true;
                 }
             }
             else  return false;
         }
         else return true;
     }
-    $(".value_Class").keyup(function(event){
-        if (+event.keyCode == 16)
-        {
-            mode="none";
-        }
-    });
     $("#saveData").click(function(){
        var result=[],
            rows=$("#main_table tr"),
@@ -130,7 +114,8 @@ document.addEventListener("DOMContentLoaded", function(){
                 {
                     bool=false;
                     item.style.borderColor="red";
-                    $("#stringError").show("slow");
+                    $("#stringError").fadeIn(1500);
+                    $("#stringError").fadeOut(1500);
                 }
             }
             if (item.name == "number")
@@ -141,14 +126,16 @@ document.addEventListener("DOMContentLoaded", function(){
                 {
                     bool=false;
                     item.style.borderColor="red";
-                    $("#intError").show("slow");
+                    $("#intError").fadeIn(1500);
+                    $("#intError").fadeOut(1500);
                 }
 
             }
             if (item.value == "")
             {
                 item.style.borderColor="red";
-                $("#emptyError").show("slow");
+                $("#emptyError").fadeIn(1500);
+                $("#emptyError").fadeOut(1500);
                 bool=false;
             }
 
@@ -159,7 +146,8 @@ document.addEventListener("DOMContentLoaded", function(){
         });
         if (!onechecked)
         {
-            $("#boolError").show("slow");
+            $("#boolError").fadeIn(1500);
+            $("#boolError").fadeOut(1500);
 
         }
         if (bool && onechecked) {
@@ -197,7 +185,7 @@ document.addEventListener("DOMContentLoaded", function(){
         $("button#savedata")[0].style.backgroundColor=currentColor;
         setTimeout(function(){
             $("button#savedata")[0].style.backgroundColor=null;
-        },1000);
+        },1500);
     }
     function clearValueInput() {
         [].forEach.call($("input.value_Class"), function (item) {
