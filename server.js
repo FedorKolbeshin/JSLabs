@@ -13,6 +13,12 @@ http.createServer(function (req, res) {
         res.setHeader('Content-Type', 'text/html; charset=utf-8');
         res.end(currentPage);
     }
+    else if (req.url == '/getNewXML.html')
+    {
+        fs.readFile(__dirname + '/xml/input.xml', function(err, data) {
+            res.end(data);
+        });
+    }
     else if (req.url == '/saveXML')
     {
         var incomeJSON;
@@ -46,8 +52,16 @@ http.createServer(function (req, res) {
             res.end(js);
         })
     }
-    else if (req.url == '/main_styles.css') {
-        fs.readFile('js/main_styles.css', function (err, css) {
+    else if (req.url == '/css/main_styles.css') {
+        fs.readFile('css/main_styles.css', function (err, css) {
+            if (err) {
+                throw err;
+            }
+            res.end(css);
+        })
+    }
+    else if (req.url == '/css/bootstrap.min.css') {
+        fs.readFile('css/bootstrap.min.css', function (err, css) {
             if (err) {
                 throw err;
             }

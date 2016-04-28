@@ -5,21 +5,21 @@
 		<Name>Billing Code</Name>
 		<Description>This is blah-blah-blah</Description>
 		<Type>System.String</Type>
-		<Value>31fg1е53</Value>
+		<Value>31fg1е53еb</Value>
 	</Parameter>
 	<Parameter>
 		<Id>BillingCode</Id>
 		<Name>Billing Code</Name>
 		<Description>This is blah-blah-blah</Description>
 		<Type>System.String</Type>
-		<Value>31fg1е53</Value>
+		<Value>31fg1е53еb</Value>
 	</Parameter>
 	<Parameter>
 		<Id>BillingCode</Id>
 		<Name>Billing Code</Name>
 		<Description>This is blah-blah-blah</Description>
 		<Type>System.String</Type>
-		<Value>31fg1е53</Value>
+		<Value>31fg1е53еb</Value>
 	</Parameter>
 	<Parameter>
 		<Id>AbandonmentRate</Id>
@@ -33,7 +33,7 @@
 		<Name>Nuisance call abandonment rate</Name>
 		<Description>This is blah-blah-blah </Description>
 		<Type>System.Int32</Type>
-		<Value>1</Value>
+		<Value>12</Value>
 	</Parameter>
 	<Parameter>
 		<Id>AbandonmentRate</Id>
@@ -46,8 +46,8 @@
 		<Id>AbandonmentRate</Id>
 		<Name>Nuisance call abandonment rate</Name>
 		<Description>This is blah-blah-blah </Description>
-		<Type>System.Boolean</Type>
-		<Value>true</Value>
+		<Type>System.Int32</Type>
+		<Value>12</Value>
 	</Parameter>
 	<Parameter>
 		<Id>AbandonmentRate</Id>

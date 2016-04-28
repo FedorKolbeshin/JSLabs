@@ -29,3 +29,8 @@ input,select,button
     margin-left:10%;
     margin-right: 10%;
 }
+table
+{
+    border-radius:10px;
+    width:100%;
+}

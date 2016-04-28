@@ -2,7 +2,6 @@
  * Created by fReDDy on 17.04.2016.
  */
 document.addEventListener("DOMContentLoaded", function(){
-    var inputError;
     $(document).ready(function(){
         $("#stringError")[0].hidden=true;
         $("#intError")[0].hidden=true;
@@ -13,14 +12,14 @@ document.addEventListener("DOMContentLoaded", function(){
     $("#addString").click(function() {
         var tr = '<tr>';
         for (var i = 0; i < 3; i++)
-            tr = tr + '<td><input style="width:100%" type="text" value="newString"></td>';
-        tr = tr + '<td><select style="width:100%" class="typeSelection">' +
+            tr = tr + '<td><input class="form-control" type="text" value="newString"></td>';
+        tr = tr + '<td><select class="typeSelection form-control">' +
             '<option selected>System.String</option>' +
             '<option>System.Int32</option>' +
             '<option>System.Boolean</option>' +
             '</select></td>' +
-            '<td><input class="value_Class" style="width:100%" type="text" name="text" value="text"></td>' +
-            '<td><button style="width:100%" class="remove_row">delete</button></td>' +
+            '<td><input class="value_Class form-control" type="text" name="text" value="text"></td>' +
+            '<td><button class="remove_row btn btn-primary btn-sm">delete</button></td>' +
             '</tr>';
         var trObject = $(tr);
 
@@ -32,19 +31,24 @@ document.addEventListener("DOMContentLoaded", function(){
         trObject.find('.value_Class').bind('keypress', function (event) {
             return KeyPressHandling(this, event);
         });
-        trObject.find('.value_Class').bind('keyup', function (event) {
-
+        trObject.find('.value_Class').bind('blur',function(){
+            clearErrorWarnings(this);
         });
         $("#main_table").last().append(trObject);
     });
     $(".remove_row").click(function(){
         removeRow();
     });
-    $(".value_Class").on('focus',function(){
-        if (this.style.borderColor == "red") {
-            this.style.borderColor = "";
+    $(".value_Class").on('blur',function(){
+        clearErrorWarnings(this);
+    });
+    function clearErrorWarnings(current){
+        if (current.style.borderColor == "red") {
+            $("#intError").fadeOut(1000);
+            $("#pasteError").fadeOut(1000);
+            current.style.borderColor = "";
         }
-    })
+    }
     $(".value_Class").on('paste',function(event)
     {
         return PasteHandling(this,event);
@@ -57,9 +61,14 @@ document.addEventListener("DOMContentLoaded", function(){
             if (isNaN(+newValue) || newValue[0] == '-' && newValue[1] == '0'
                 || newValue[0] =='0' && newValue.length >1) {
                 currentEvent.style.borderColor="red";
-                inputError=currentEvent;
                 $("#pasteError").fadeIn(1000);
-                $("#pasteError").fadeOut(1000);
+                event.preventDefault();
+            }
+            else if (+newValue>2147483647 || +newValue<-2147483647)
+            {
+                currentEvent.style.borderColor="red";
+                $("#intError")[0].innerHTML="<h3>Int MaxValue: 2 147 483 647 </br> Int MinValue: -2 147 483 647";
+                $("#intError").fadeIn(1000);
                 event.preventDefault();
             }
         }
@@ -69,7 +78,6 @@ document.addEventListener("DOMContentLoaded", function(){
         return KeyPressHandling(this,event);
     })
     function KeyPressHandling(currentEvent,event) {
-        console.log(event.which);
         if (currentEvent.name == "number") {
             if (String.fromCharCode(event.which) == '-') {
                 var newValue = currentEvent.value.slice(0, currentEvent.selectionStart) +
@@ -84,18 +92,29 @@ document.addEventListener("DOMContentLoaded", function(){
                 if (currentEvent.value == '0') {
                     return false;
                 }
-                if (+event.keyCode == 48) {
+                else if (+event.keyCode == 48) {
                     if (+currentEvent.selectionStart == 0 && (currentEvent.value.length != 0)
                         || currentEvent.value.length == 1 && currentEvent.value[0] == '0'
                         || currentEvent.value[0] == '-' && currentEvent.selectionStart == 1) {
                         return false;
                     }
                 }
-                if (currentEvent.selectionStart == 0 && currentEvent.selectionEnd == 0 && currentEvent.value[0] == '-') {
+                else if (currentEvent.selectionStart == 0 && currentEvent.selectionEnd == 0 && currentEvent.value[0] == '-') {
                     return false;
                 }
                 else {
-                    return true;
+                    var newValue = currentEvent.value.slice(0, currentEvent.selectionStart) +
+                        String.fromCharCode(+event.keyCode) +
+                        currentEvent.value.slice(currentEvent.selectionEnd);
+                    console.log(newValue);
+                    if (+newValue <= 2147483647 && +newValue >= -2147483647)
+                        return true;
+                    else {
+                        $("#intError")[0].innerHTML = "<h3>Int MaxValue: 2 147 483 647 </br> Int MinValue: -2 147 483 647";
+                        currentEvent.style.borderColor = "red";
+                        $("#intError").fadeIn(1000);
+                        return false;
+                    }
                 }
             }
             else  return false;
@@ -126,6 +145,7 @@ document.addEventListener("DOMContentLoaded", function(){
                 {
                     bool=false;
                     item.style.borderColor="red";
+                    $("#intError")[0].innerHTML="<h3>int value must be between [-256,256]!!!</h3>";
                     $("#intError").fadeIn(1500);
                     $("#intError").fadeOut(1500);
                 }
@@ -174,6 +194,8 @@ document.addEventListener("DOMContentLoaded", function(){
                     url: "/saveXML",
                     data: JSON.stringify(result),
                     success: function (response) {
+                        if (confirm("Хотите просмотреть получишийся XML?"))
+                        window.open('getNewXML.html','_blank');
                         animateColor("green");
                     }
                 }
@@ -191,10 +213,6 @@ document.addEventListener("DOMContentLoaded", function(){
         [].forEach.call($("input.value_Class"), function (item) {
             item.style.borderColor = "";
         });
-        $("#emptyError").hide("slow");
-        $("#stringError").hide("slow");
-        $("#intError").hide("slow");
-        $("#boolError").hide("slow");
     };
     $(".typeSelection").change(changeSelectHandler);
     function changeSelectHandler() {
